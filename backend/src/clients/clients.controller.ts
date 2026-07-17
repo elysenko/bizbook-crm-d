@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import { Auth } from 'src/auth/decorators';
-import { Role } from '@generated/prisma/client';
+import { Auth } from '../auth/decorators';
+import { Role } from '../generated/prisma/client';
 
 @ApiTags('Clients')
 @ApiBearerAuth()

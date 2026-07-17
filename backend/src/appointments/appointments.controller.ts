@@ -4,9 +4,9 @@ import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentStatusDto } from './dto/update-appointment-status.dto';
 import { QueryAppointmentsDto } from './dto/query-appointments.dto';
-import { Auth, GetUser } from 'src/auth/decorators';
-import { Role } from '@generated/prisma/client';
-import { User } from 'src/user/entities/user.entity';
+import { Auth, GetUser } from '../auth/decorators';
+import { Role } from '../generated/prisma/client';
+import { User } from '../user/entities/user.entity';
 
 @ApiTags('Appointments')
 @ApiBearerAuth()

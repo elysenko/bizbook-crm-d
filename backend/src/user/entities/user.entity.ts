@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '@generated/prisma/client';
+import { Role } from '../../generated/prisma/client';
 
 export class User {
   @ApiProperty({

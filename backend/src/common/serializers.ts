@@ -1,4 +1,4 @@
-import { Role } from '@generated/prisma/client';
+import { Role } from '../generated/prisma/client';
 
 /**
  * The Angular frontend models `UserRole` as the uppercase literals 'ADMIN' | 'USER',

@@ -5,9 +5,9 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
-import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from 'src/user/entities/user.entity';
-import { EnvironmentVariables } from '@/common/config/env.config';
+import { PrismaService } from '../../prisma/prisma.service';
+import { User } from '../../user/entities/user.entity';
+import { EnvironmentVariables } from '../../common/config/env.config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

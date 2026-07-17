@@ -2,8 +2,8 @@ import { Body, Controller, Get, Patch } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SettingsService } from './settings.service';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
-import { Auth } from 'src/auth/decorators';
-import { Role } from '@generated/prisma/client';
+import { Auth } from '../auth/decorators';
+import { Role } from '../generated/prisma/client';
 
 @ApiTags('Admin Settings')
 @ApiBearerAuth()

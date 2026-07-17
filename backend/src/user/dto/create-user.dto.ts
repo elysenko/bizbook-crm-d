@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '@generated/prisma/client';
+import { Role } from '../../generated/prisma/client';
 import { IsOptional, IsString } from 'class-validator';
 
-import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
+import { RegisterUserDto } from '../../auth/dto/register-user.dto';
 
 export class CreateUserDto extends RegisterUserDto {
   @ApiProperty({

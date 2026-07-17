@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { APP_TZ, todayRange } from 'src/common/dates';
+import { PrismaService } from '../prisma/prisma.service';
+import { APP_TZ, todayRange } from '../common/dates';
 import {
   APPOINTMENT_INCLUDE,
   AppointmentView,
   toAppointmentView,
-} from 'src/appointments/appointments.service';
-import { AppointmentStatus } from '@generated/prisma/client';
+} from '../appointments/appointments.service';
+import { AppointmentStatus } from '../generated/prisma/client';
 
 export interface TodayDashboard {
   date: string; // YYYY-MM-DD in APP_TZ

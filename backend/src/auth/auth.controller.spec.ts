@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { HttpStatus } from '@nestjs/common';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Role } from '../generated/prisma/client';
 
 describe('AuthController', () => {

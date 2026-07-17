@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentStatusDto } from './dto/update-appointment-status.dto';
 import { QueryAppointmentsDto } from './dto/query-appointments.dto';
-import { APP_TZ, dateStringRange } from 'src/common/dates';
-import { AppointmentStatus, Prisma } from '@generated/prisma/client';
+import { APP_TZ, dateStringRange } from '../common/dates';
+import { AppointmentStatus, Prisma } from '../generated/prisma/client';
 
 /**
  * Flattened appointment shape consumed by the Angular frontend (`core/models.ts`).

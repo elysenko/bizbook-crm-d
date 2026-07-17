@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 // Mock bcrypt entirely

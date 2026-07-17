@@ -11,11 +11,11 @@ import * as bcrypt from 'bcryptjs';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
-import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from 'src/user/entities/user.entity';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '../user/entities/user.entity';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { SignupUserDto } from './dto/signup-user.dto';
-import { toApiUser } from 'src/common/serializers';
+import { toApiUser } from '../common/serializers';
 
 @Injectable()
 export class AuthService {

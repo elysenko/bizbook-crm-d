@@ -3,9 +3,9 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Auth, GetUser } from 'src/auth/decorators';
+import { Auth, GetUser } from '../auth/decorators';
 import { User } from './entities/user.entity';
-import { Role } from '@generated/prisma/client';
+import { Role } from '../generated/prisma/client';
 
 @ApiBearerAuth()
 @ApiTags('Users')

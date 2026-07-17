@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RevenueService } from './revenue.service';
-import { Auth } from 'src/auth/decorators';
-import { Role } from '@generated/prisma/client';
+import { Auth } from '../auth/decorators';
+import { Role } from '../generated/prisma/client';
 
 @ApiTags('Revenue')
 @ApiBearerAuth()
