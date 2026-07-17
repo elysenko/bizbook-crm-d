@@ -1,0 +1,5 @@
+{
+  "ready_testid": "app-ready",
+  "expect_text": [],
+  "reject_signatures": ["<h1>Welcome</h1>", "You are logged in.", "Enter your email"]
+}
