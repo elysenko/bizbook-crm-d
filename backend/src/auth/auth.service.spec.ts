@@ -130,12 +130,14 @@ describe('AuthService', () => {
 
       const result = await authService.loginUser(email, password);
 
+      // loginUser now returns the API-shaped user (uppercase role, null image mapped to
+      // undefined) that the frontend consumes.
       expect(result.user).toEqual({
         id: mockUser.id,
         name: mockUser.name,
         email: mockUser.email,
-        image: mockUser.image,
-        role: mockUser.role,
+        image: undefined,
+        role: 'USER',
         createdAt: mockUser.createdAt,
       });
       expect(result.token).toBe('mock-token');

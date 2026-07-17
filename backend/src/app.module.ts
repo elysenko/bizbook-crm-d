@@ -9,6 +9,12 @@ import { validateConfig } from './common/config/env.config';
 import { HealthModule } from './health/health.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ClientsModule } from './clients/clients.module';
+import { ServicesModule } from './services/services.module';
+import { AppointmentsModule } from './appointments/appointments.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { RevenueModule } from './revenue/revenue.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -28,6 +34,12 @@ import { APP_GUARD } from '@nestjs/core';
     PrismaModule,
     UserModule,
     HealthModule,
+    ClientsModule,
+    ServicesModule,
+    AppointmentsModule,
+    DashboardModule,
+    RevenueModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [

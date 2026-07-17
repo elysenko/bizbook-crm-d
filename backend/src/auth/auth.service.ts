@@ -14,6 +14,8 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from 'src/user/entities/user.entity';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import { SignupUserDto } from './dto/signup-user.dto';
+import { toApiUser } from 'src/common/serializers';
 
 @Injectable()
 export class AuthService {
@@ -102,11 +104,64 @@ export class AuthService {
 
     this.logger.log(`POST: auth/login: Usuario aceptado: ${user.email}`);
     return {
-      user,
+      user: toApiUser(user),
       token: this.getJwtToken({
         id: user.id,
       }),
     };
+  }
+
+  /**
+   * Public signup for BizBook Pro. The very first account created in an empty system becomes
+   * ADMIN; every subsequent signup is a regular USER. Returns the API-shaped user (uppercase
+   * role) plus an access token so the frontend can persist the session immediately.
+   */
+  async signupUser(dto: SignupUserDto): Promise<{ user: ReturnType<typeof toApiUser>; token: string }> {
+    this.logger.log(`POST: auth/signup: Signup started: ${dto.email}`);
+
+    const email = dto.email.toLowerCase().trim();
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    try {
+      const userCount = await this.prisma.user.count();
+      const role = userCount === 0 ? 'admin' : 'user';
+
+      const newUser = await this.prisma.user.create({
+        data: {
+          name: dto.name,
+          email,
+          password: hashedPassword,
+          role,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          role: true,
+          createdAt: true,
+        },
+      });
+
+      return {
+        user: toApiUser(newUser),
+        token: this.getJwtToken({ id: newUser.id }),
+      };
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+        this.logger.warn(`POST: auth/signup: User already exists: ${email}`);
+        throw new BadRequestException('User already exists');
+      }
+      this.logger.error(`POST: auth/signup: error: ${JSON.stringify(error)}`);
+      throw new InternalServerErrorException('Server error');
+    }
+  }
+
+  /**
+   * Return the currently authenticated user (as resolved by JwtStrategy) in API shape.
+   */
+  async getMe(user: User) {
+    return toApiUser(user as any);
   }
 
   async refreshToken(user: User) {
