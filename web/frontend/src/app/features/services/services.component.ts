@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Service } from '../../core/models';
+import { CatalogService, ServiceInput } from '../../core/services/catalog.service';
 import { ModalComponent } from '../../components/modal/modal.component';
 import { formatCents, formatDuration } from '../../core/format';
 
@@ -19,23 +20,19 @@ export class ServicesComponent implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
-  // Data contract — cleared by mockup_cleaner, wired to /api/services by service_agent.
-  readonly services = signal<Service[]>([
-    { id: 's1', name: 'Haircut & Style', durationMinutes: 45, priceCents: 5500, createdAt: '2026-01-05T10:00:00' },
-    { id: 's2', name: 'Beard Trim', durationMinutes: 20, priceCents: 2500, createdAt: '2026-01-05T10:00:00' },
-    { id: 's3', name: 'Color Treatment', durationMinutes: 90, priceCents: 12000, createdAt: '2026-01-05T10:00:00' },
-    { id: 's4', name: 'Deep Conditioning', durationMinutes: 30, priceCents: 4000, createdAt: '2026-01-05T10:00:00' },
-    { id: 's5', name: 'Blowout', durationMinutes: 40, priceCents: 4500, createdAt: '2026-01-05T10:00:00' },
-  ]);
+  // Live data loaded from GET /api/v1/services.
+  readonly services = signal<Service[]>([]);
 
   modalMode: 'create' | 'edit' | null = null;
   editingId: string | null = null;
+  saving = false;
   form: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
+    private catalog: CatalogService,
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required]],
@@ -45,6 +42,7 @@ export class ServicesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.load();
     this.route.queryParamMap.subscribe((params) => {
       const modal = params.get('modal');
       this.editingId = params.get('id');
@@ -65,6 +63,21 @@ export class ServicesComponent implements OnInit {
     });
   }
 
+  load(): void {
+    this.loading.set(true);
+    this.error.set(null);
+    this.catalog.list().subscribe({
+      next: (list) => {
+        this.services.set(list);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Could not load services. Please try again.');
+        this.loading.set(false);
+      },
+    });
+  }
+
   openCreate(): void {
     this.router.navigate([], { queryParams: { modal: 'create' } });
   }
@@ -81,30 +94,36 @@ export class ServicesComponent implements OnInit {
       return;
     }
     const { name, durationMinutes, priceDollars } = this.form.value;
-    const priceCents = Math.round(Number(priceDollars) * 100);
-    if (this.modalMode === 'edit' && this.editingId) {
-      const id = this.editingId;
-      this.services.update((list) =>
-        list.map((s) =>
-          s.id === id ? { ...s, name, durationMinutes: Number(durationMinutes), priceCents } : s,
-        ),
-      );
-    } else {
-      this.services.update((list) => [
-        {
-          id: 'tmp-' + list.length,
-          name,
-          durationMinutes: Number(durationMinutes),
-          priceCents,
-          createdAt: '2026-07-17T10:00:00',
-        },
-        ...list,
-      ]);
-    }
-    this.closeModal();
+    const dto: ServiceInput = {
+      name,
+      durationMinutes: Number(durationMinutes),
+      priceCents: Math.round(Number(priceDollars) * 100),
+    };
+    this.saving = true;
+    this.error.set(null);
+    const request =
+      this.modalMode === 'edit' && this.editingId
+        ? this.catalog.update(this.editingId, dto)
+        : this.catalog.create(dto);
+    request.subscribe({
+      next: () => {
+        this.saving = false;
+        this.closeModal();
+        this.load();
+      },
+      error: (err) => {
+        this.saving = false;
+        this.error.set(err?.error?.message ?? 'Could not save service. Please try again.');
+      },
+    });
   }
 
   remove(service: Service): void {
-    this.services.update((list) => list.filter((s) => s.id !== service.id));
+    this.error.set(null);
+    this.catalog.remove(service.id).subscribe({
+      next: () => this.load(),
+      error: (err) =>
+        this.error.set(err?.error?.message ?? 'Could not delete service. Please try again.'),
+    });
   }
 }

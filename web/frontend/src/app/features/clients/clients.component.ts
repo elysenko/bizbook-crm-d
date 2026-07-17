@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Client } from '../../core/models';
+import { ClientsService, ClientInput } from '../../core/services/clients.service';
 import { ModalComponent } from '../../components/modal/modal.component';
 
 @Component({
@@ -16,24 +17,20 @@ export class ClientsComponent implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
-  // Data contract — cleared by mockup_cleaner, wired to /api/clients by service_agent.
-  readonly clients = signal<Client[]>([
-    { id: 'c1', name: 'Priya Nair', phone: '(415) 555-0132', email: 'priya.nair@example.com', notes: 'Prefers morning slots.', createdAt: '2026-02-11T10:00:00' },
-    { id: 'c2', name: 'Marcus Bell', phone: '(415) 555-0177', email: 'marcus.b@example.com', notes: '', createdAt: '2026-03-02T10:00:00' },
-    { id: 'c3', name: 'Elena Duarte', phone: '(628) 555-0199', email: 'elena.duarte@example.com', notes: 'Allergic to ammonia dyes.', createdAt: '2026-03-20T10:00:00' },
-    { id: 'c4', name: 'Tom Fletcher', phone: '(510) 555-0143', email: '', notes: '', createdAt: '2026-04-08T10:00:00' },
-    { id: 'c5', name: 'Aisha Khan', phone: '(415) 555-0164', email: 'aisha.khan@example.com', notes: 'Referral from Elena.', createdAt: '2026-05-15T10:00:00' },
-  ]);
+  // Live data loaded from GET /api/v1/clients.
+  readonly clients = signal<Client[]>([]);
 
   // modal state derived from query params
   modalMode: 'create' | 'edit' | null = null;
   editingId: string | null = null;
+  saving = false;
   form: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
+    private clientsApi: ClientsService,
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required]],
@@ -44,6 +41,7 @@ export class ClientsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.load();
     this.route.queryParamMap.subscribe((params) => {
       const modal = params.get('modal');
       this.editingId = params.get('id');
@@ -65,6 +63,21 @@ export class ClientsComponent implements OnInit {
     });
   }
 
+  load(): void {
+    this.loading.set(true);
+    this.error.set(null);
+    this.clientsApi.list().subscribe({
+      next: (list) => {
+        this.clients.set(list);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Could not load clients. Please try again.');
+        this.loading.set(false);
+      },
+    });
+  }
+
   openCreate(): void {
     this.router.navigate([], { queryParams: { modal: 'create' } });
   }
@@ -80,20 +93,38 @@ export class ClientsComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    const value = this.form.value as Omit<Client, 'id' | 'createdAt'>;
-    if (this.modalMode === 'edit' && this.editingId) {
-      const id = this.editingId;
-      this.clients.update((list) => list.map((c) => (c.id === id ? { ...c, ...value } : c)));
-    } else {
-      this.clients.update((list) => [
-        { id: 'tmp-' + list.length, createdAt: '2026-07-17T10:00:00', ...value },
-        ...list,
-      ]);
-    }
-    this.closeModal();
+    const value = this.form.value;
+    const dto: ClientInput = {
+      name: value.name,
+      phone: value.phone,
+      ...(value.email ? { email: value.email } : {}),
+      ...(value.notes ? { notes: value.notes } : {}),
+    };
+    this.saving = true;
+    this.error.set(null);
+    const request =
+      this.modalMode === 'edit' && this.editingId
+        ? this.clientsApi.update(this.editingId, dto)
+        : this.clientsApi.create(dto);
+    request.subscribe({
+      next: () => {
+        this.saving = false;
+        this.closeModal();
+        this.load();
+      },
+      error: (err) => {
+        this.saving = false;
+        this.error.set(err?.error?.message ?? 'Could not save client. Please try again.');
+      },
+    });
   }
 
   remove(client: Client): void {
-    this.clients.update((list) => list.filter((c) => c.id !== client.id));
+    this.error.set(null);
+    this.clientsApi.remove(client.id).subscribe({
+      next: () => this.load(),
+      error: (err) =>
+        this.error.set(err?.error?.message ?? 'Could not delete client. Please try again.'),
+    });
   }
 }
