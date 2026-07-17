@@ -6,6 +6,8 @@
 
 generator client {
   provider = "prisma-client"
+  binaryTargets = ["native", "linux-arm64-openssl-1.1.x", "linux-arm64-openssl-3.0.x"]
+  engineType   = "library"
   output   = "../src/generated/prisma"
   // moduleFormat = "esm"
 }
