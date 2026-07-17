@@ -1,0 +1,33 @@
+.settings-stack { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.svc { padding: var(--space-5); }
+.svc-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.svc-title { font-size: var(--font-size-lg); }
+.svc-desc { margin: 4px 0 0; color: var(--color-text-muted); font-size: var(--font-size-sm); }
+
+.svc-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.svc-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+.saved-note { color: var(--color-success); font-size: var(--font-size-sm); font-weight: 600; }
+
+@media (max-width: 768px) {
+  .svc-foot .btn { flex: 1; }
+}

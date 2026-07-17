@@ -1,0 +1,71 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Front Desk — Today</h1>
+      <p class="page-subtitle">Friday, July 17 · {{ auth.user()?.name }}</p>
+    </div>
+    <a class="btn btn-primary" routerLink="/appointments" [queryParams]="{ modal: 'book' }">+ Book appointment</a>
+  </div>
+
+  <!-- Summary tiles -->
+  <div class="tiles">
+    <div class="tile card">
+      <span class="tile-label">Remaining today</span>
+      <span class="tile-value">{{ remaining() }}</span>
+      <span class="tile-hint">booked & upcoming</span>
+    </div>
+    <div class="tile card">
+      <span class="tile-label">Completed</span>
+      <span class="tile-value">{{ completedToday() }}</span>
+      <span class="tile-hint">served so far</span>
+    </div>
+    <div class="tile card">
+      <span class="tile-label">On the books</span>
+      <span class="tile-value">{{ sorted().length }}</span>
+      <span class="tile-hint">total appointments</span>
+    </div>
+  </div>
+
+  <!-- Schedule -->
+  <section class="card schedule">
+    <header class="schedule-head">
+      <h2>Schedule</h2>
+      <span class="badge badge-neutral">{{ sorted().length }} appointments</span>
+    </header>
+
+    @if (loading()) {
+      <div class="state"><div class="skeleton" style="width: 60%"></div></div>
+    } @else if (error()) {
+      <div class="state"><span class="state-icon">⚠️</span><p>{{ error() }}</p></div>
+    } @else if (sorted().length === 0) {
+      <div class="state">
+        <span class="state-icon">☕</span>
+        <p>No appointments booked for today.</p>
+        <a class="btn btn-secondary" routerLink="/appointments" [queryParams]="{ modal: 'book' }">Book the first one</a>
+      </div>
+    } @else {
+      <ul class="timeline">
+        @for (appt of sorted(); track appt.id) {
+          <li class="slot" [class.dimmed]="appt.status === 'CANCELLED'">
+            <span class="slot-time mono">{{ formatTime(appt.startTime) }}</span>
+            <span class="slot-line" aria-hidden="true"></span>
+            <div class="slot-body">
+              <div class="slot-main">
+                <span class="slot-client">{{ appt.clientName }}</span>
+                <span class="slot-service">{{ appt.serviceName }} · {{ formatDuration(appt.durationMinutes) }}</span>
+              </div>
+              <div class="slot-meta">
+                <span class="slot-price mono">{{ formatCents(appt.priceCents) }}</span>
+                @switch (appt.status) {
+                  @case ('BOOKED') { <span class="badge badge-info">Booked</span> }
+                  @case ('COMPLETED') { <span class="badge badge-success">Completed</span> }
+                  @case ('CANCELLED') { <span class="badge badge-danger">Cancelled</span> }
+                }
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>

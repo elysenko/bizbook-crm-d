@@ -1,0 +1,103 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Services</h1>
+      <p class="page-subtitle">{{ services().length }} services in your catalog</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">+ New service</button>
+  </div>
+
+  <div class="card">
+    @if (loading()) {
+      <div class="state"><div class="skeleton" style="width:50%"></div></div>
+    } @else if (error()) {
+      <div class="state"><span class="state-icon">⚠️</span><p>{{ error() }}</p></div>
+    } @else if (services().length === 0) {
+      <div class="state">
+        <span class="state-icon">🧾</span>
+        <p>No services yet.</p>
+        <button class="btn btn-secondary" (click)="openCreate()">Add your first service</button>
+      </div>
+    } @else {
+      <table class="data-table desktop-only">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Duration</th>
+            <th>Price</th>
+            <th aria-label="actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (service of services(); track service.id) {
+            <tr>
+              <td><strong>{{ service.name }}</strong></td>
+              <td>{{ formatDuration(service.durationMinutes) }}</td>
+              <td class="mono">{{ formatCents(service.priceCents) }}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary btn-sm" (click)="openEdit(service)">Edit</button>
+                  <button class="btn btn-danger btn-sm" (click)="remove(service)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <ul class="card-list mobile-only">
+        @for (service of services(); track service.id) {
+          <li class="service-card">
+            <div class="service-top">
+              <strong>{{ service.name }}</strong>
+              <span class="mono price">{{ formatCents(service.priceCents) }}</span>
+            </div>
+            <span class="muted">{{ formatDuration(service.durationMinutes) }}</span>
+            <div class="row-actions">
+              <button class="btn btn-secondary btn-sm" (click)="openEdit(service)">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="remove(service)">Delete</button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>
+
+@if (modalMode) {
+  <app-modal
+    [title]="modalMode === 'edit' ? 'Edit service' : 'New service'"
+    subtitle="Name, duration and price"
+    (closed)="closeModal()"
+  >
+    <form [formGroup]="form" (ngSubmit)="save()" class="modal-form">
+      <div class="field">
+        <label for="name">Service name</label>
+        <input id="name" class="input" type="text" formControlName="name" placeholder="e.g. Haircut & Style" />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <span class="form-error">Name is required.</span>
+        }
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="duration">Duration (min)</label>
+          <input id="duration" class="input" type="number" min="5" step="5" formControlName="durationMinutes" />
+          @if (form.get('durationMinutes')?.invalid && form.get('durationMinutes')?.touched) {
+            <span class="form-error">Min 5 minutes.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="price">Price (USD)</label>
+          <input id="price" class="input" type="number" min="0" step="0.5" formControlName="priceDollars" />
+          @if (form.get('priceDollars')?.invalid && form.get('priceDollars')?.touched) {
+            <span class="form-error">Enter a valid price.</span>
+          }
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" (click)="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">{{ modalMode === 'edit' ? 'Save changes' : 'Add service' }}</button>
+      </div>
+    </form>
+  </app-modal>
+}

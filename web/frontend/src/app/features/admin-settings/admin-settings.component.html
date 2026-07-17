@@ -1,0 +1,55 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Admin Settings</h1>
+      <p class="page-subtitle">Backing-service credentials for this workspace</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="card"><div class="state"><div class="skeleton" style="width:50%"></div></div></div>
+  } @else if (error()) {
+    <div class="card"><div class="state"><span class="state-icon">⚠️</span><p>{{ error() }}</p></div></div>
+  } @else {
+    <div class="settings-stack">
+      @for (setting of settings(); track setting.service) {
+        <section class="card svc">
+          <header class="svc-head">
+            <div>
+              <h2 class="svc-title">{{ setting.label }}</h2>
+              <p class="svc-desc">{{ setting.description }}</p>
+            </div>
+            @if (setting.configured) {
+              <span class="badge badge-success">● Configured</span>
+            } @else {
+              <span class="badge badge-warning">● Not configured</span>
+            }
+          </header>
+
+          <div class="svc-fields">
+            @for (field of setting.fields; track field.key) {
+              <div class="field">
+                <label [for]="field.key">{{ field.label }}</label>
+                <input
+                  [id]="field.key"
+                  class="input"
+                  [type]="field.secret ? 'password' : 'text'"
+                  [placeholder]="field.placeholder"
+                  [(ngModel)]="field.value"
+                  [name]="field.key"
+                />
+              </div>
+            }
+          </div>
+
+          <div class="svc-foot">
+            @if (savedService() === setting.service) {
+              <span class="saved-note">✓ Saved</span>
+            }
+            <button class="btn btn-primary" (click)="save(setting)">Save {{ setting.label }}</button>
+          </div>
+        </section>
+      }
+    </div>
+  }
+</div>

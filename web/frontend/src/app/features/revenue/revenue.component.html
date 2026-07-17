@@ -1,0 +1,49 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Revenue</h1>
+      <p class="page-subtitle">Completed appointment totals</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="card"><div class="state"><div class="skeleton" style="width:50%"></div></div></div>
+  } @else if (error()) {
+    <div class="card"><div class="state"><span class="state-icon">⚠️</span><p>{{ error() }}</p></div></div>
+  } @else {
+    <div class="rev-grid">
+      <div class="rev-card card">
+        <span class="rev-label">This week</span>
+        <span class="rev-value mono">{{ formatCents(summary().weekCents) }}</span>
+        <span class="rev-meta">{{ summary().weekCount }} completed · {{ summary().weekLabel }}</span>
+      </div>
+      <div class="rev-card card accent">
+        <span class="rev-label">This month</span>
+        <span class="rev-value mono">{{ formatCents(summary().monthCents) }}</span>
+        <span class="rev-meta">{{ summary().monthCount }} completed · {{ summary().monthLabel }}</span>
+      </div>
+    </div>
+
+    <section class="card breakdown">
+      <header class="breakdown-head">
+        <h2>This week's completed appointments</h2>
+        <span class="badge badge-neutral">{{ weekCompleted().length }}</span>
+      </header>
+      @if (weekCompleted().length === 0) {
+        <div class="state"><span class="state-icon">💤</span><p>No completed appointments this week yet.</p></div>
+      } @else {
+        <ul class="break-list">
+          @for (appt of weekCompleted(); track appt.id) {
+            <li class="break-row">
+              <div class="break-main">
+                <span class="break-client">{{ appt.clientName }}</span>
+                <span class="break-sub">{{ appt.serviceName }} · {{ formatDate(appt.startTime) }} {{ formatTime(appt.startTime) }}</span>
+              </div>
+              <span class="break-amount mono">{{ formatCents(appt.priceCents) }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+</div>

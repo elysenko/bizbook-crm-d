@@ -1,0 +1,17 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-panel" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <div class="modal-grabber" aria-hidden="true"></div>
+    <header class="modal-header">
+      <div>
+        <h2 class="modal-title">{{ title }}</h2>
+        @if (subtitle) {
+          <p class="modal-subtitle">{{ subtitle }}</p>
+        }
+      </div>
+      <button type="button" class="modal-close" (click)="close()" aria-label="Close">✕</button>
+    </header>
+    <div class="modal-body">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

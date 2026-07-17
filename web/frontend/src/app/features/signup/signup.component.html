@@ -1,0 +1,56 @@
+<div class="auth-wrap">
+  <div class="auth-card card">
+    <div class="auth-brand">
+      <span class="auth-mark">B</span>
+      <span class="auth-brandname">BizBook</span>
+    </div>
+    <h1 class="auth-title">Create your account</h1>
+    <p class="auth-sub">The first account becomes the workspace admin.</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="field">
+        <label for="name">Full name</label>
+        <input id="name" class="input" type="text" formControlName="name" placeholder="Alex Morgan" autocomplete="name" />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <span class="form-error">Name is required.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" class="input" type="email" formControlName="email" placeholder="you@business.com" autocomplete="email" />
+        @if (form.get('email')?.invalid && form.get('email')?.touched) {
+          <span class="form-error">Enter a valid email address.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" class="input" type="password" formControlName="password" placeholder="At least 8 characters" autocomplete="new-password" />
+        @if (form.get('password')?.invalid && form.get('password')?.touched) {
+          <span class="form-error">Use at least 8 characters.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="confirm">Confirm password</label>
+        <input id="confirm" class="input" type="password" formControlName="confirm" placeholder="Re-enter password" autocomplete="new-password" />
+        @if (form.hasError('mismatch') && form.get('confirm')?.touched) {
+          <span class="form-error">Passwords do not match.</span>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <div class="auth-alert">{{ errorMessage }}</div>
+      }
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+        {{ loading ? 'Creating account…' : 'Create account' }}
+      </button>
+    </form>
+
+    <p class="auth-foot">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </p>
+  </div>
+</div>

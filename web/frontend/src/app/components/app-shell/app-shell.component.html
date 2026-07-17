@@ -1,0 +1,80 @@
+<div class="shell">
+  <!-- Desktop sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">B</span>
+      <span class="brand-name">BizBook Pro</span>
+    </div>
+    <nav class="side-nav">
+      @for (item of visibleItems(); track item.path) {
+        <a
+          class="nav-link"
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: false }"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+    <div class="side-foot">
+      <div class="user-chip">
+        <span class="avatar">{{ initials }}</span>
+        <span class="user-meta">
+          <span class="user-name">{{ auth.user()?.name }}</span>
+          <span class="user-role">{{ auth.user()?.role }}</span>
+        </span>
+      </div>
+      <button class="btn btn-ghost btn-block" (click)="logout()">Log out</button>
+    </div>
+  </aside>
+
+  <!-- Mobile header -->
+  <header class="topbar">
+    <button class="icon-btn" (click)="toggleDrawer()" aria-label="Menu">☰</button>
+    <span class="topbar-brand">BizBook Pro</span>
+    <span class="avatar avatar-sm">{{ initials }}</span>
+  </header>
+
+  <!-- Mobile slide-in drawer -->
+  @if (drawerOpen()) {
+    <div class="drawer-overlay" (click)="closeDrawer()">
+      <div class="drawer" (click)="$event.stopPropagation()">
+        <div class="brand">
+          <span class="brand-mark">B</span>
+          <span class="brand-name">BizBook Pro</span>
+        </div>
+        <nav class="side-nav">
+          @for (item of visibleItems(); track item.path) {
+            <a
+              class="nav-link"
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              (click)="closeDrawer()"
+            >
+              <span class="nav-icon">{{ item.icon }}</span>
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+          }
+        </nav>
+        <button class="btn btn-ghost btn-block" (click)="logout()">Log out</button>
+      </div>
+    </div>
+  }
+
+  <!-- Routed content -->
+  <main class="content">
+    <router-outlet />
+  </main>
+
+  <!-- Mobile bottom tab bar -->
+  <nav class="tabbar">
+    @for (item of primaryItems(); track item.path) {
+      <a class="tab" [routerLink]="item.path" routerLinkActive="active">
+        <span class="tab-icon">{{ item.icon }}</span>
+        <span class="tab-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</div>

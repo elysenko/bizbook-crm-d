@@ -1,0 +1,107 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Clients</h1>
+      <p class="page-subtitle">{{ clients().length }} people in your book</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">+ New client</button>
+  </div>
+
+  <div class="card">
+    @if (loading()) {
+      <div class="state"><div class="skeleton" style="width:50%"></div></div>
+    } @else if (error()) {
+      <div class="state"><span class="state-icon">⚠️</span><p>{{ error() }}</p></div>
+    } @else if (clients().length === 0) {
+      <div class="state">
+        <span class="state-icon">👥</span>
+        <p>No clients yet.</p>
+        <button class="btn btn-secondary" (click)="openCreate()">Add your first client</button>
+      </div>
+    } @else {
+      <!-- Desktop table -->
+      <table class="data-table desktop-only">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Notes</th>
+            <th aria-label="actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (client of clients(); track client.id) {
+            <tr>
+              <td><strong>{{ client.name }}</strong></td>
+              <td class="mono">{{ client.phone }}</td>
+              <td>{{ client.email || '—' }}</td>
+              <td class="notes-cell">{{ client.notes || '—' }}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary btn-sm" (click)="openEdit(client)">Edit</button>
+                  <button class="btn btn-danger btn-sm" (click)="remove(client)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Mobile cards -->
+      <ul class="card-list mobile-only">
+        @for (client of clients(); track client.id) {
+          <li class="client-card">
+            <div class="client-top">
+              <strong>{{ client.name }}</strong>
+              <span class="mono muted">{{ client.phone }}</span>
+            </div>
+            @if (client.email) { <span class="muted">{{ client.email }}</span> }
+            @if (client.notes) { <span class="muted note">{{ client.notes }}</span> }
+            <div class="row-actions">
+              <button class="btn btn-secondary btn-sm" (click)="openEdit(client)">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="remove(client)">Delete</button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>
+
+@if (modalMode) {
+  <app-modal
+    [title]="modalMode === 'edit' ? 'Edit client' : 'New client'"
+    [subtitle]="modalMode === 'edit' ? 'Update this client\'s details' : 'Add someone to your book'"
+    (closed)="closeModal()"
+  >
+    <form [formGroup]="form" (ngSubmit)="save()" class="modal-form">
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" class="input" type="text" formControlName="name" placeholder="Full name" />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <span class="form-error">Name is required.</span>
+        }
+      </div>
+      <div class="field">
+        <label for="phone">Phone</label>
+        <input id="phone" class="input" type="tel" formControlName="phone" placeholder="(555) 555-5555" />
+        @if (form.get('phone')?.invalid && form.get('phone')?.touched) {
+          <span class="form-error">Phone is required.</span>
+        }
+      </div>
+      <div class="field">
+        <label for="email">Email <span class="opt">(optional)</span></label>
+        <input id="email" class="input" type="email" formControlName="email" placeholder="name@example.com" />
+      </div>
+      <div class="field">
+        <label for="notes">Notes <span class="opt">(optional)</span></label>
+        <textarea id="notes" class="input" formControlName="notes" placeholder="Preferences, allergies, reminders…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" (click)="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">{{ modalMode === 'edit' ? 'Save changes' : 'Add client' }}</button>
+      </div>
+    </form>
+  </app-modal>
+}
